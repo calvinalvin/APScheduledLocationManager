@@ -1,8 +1,8 @@
 # APScheduledLocationManager
  [![license MIT](https://img.shields.io/cocoapods/l/JSQCoreDataKit.svg)][mitLink]
- 
+
 Location manager that allows to get background location updates every *n* seconds with desired location accuracy.
- 
+
 *n* - range is between 2 - 170 seconds (limited by max allowed background task time)
 
 ## Requirements
@@ -20,8 +20,8 @@ use_frameworks!
 pod 'APScheduledLocationManager'
 
 ````
- 
-## Usage 
+
+## Usage
 ##### 1. Configure Xcode project
 
 In target ````Capabilities```` enable ````Background Modes```` and check ````Location updates````
@@ -40,7 +40,18 @@ import CoreLocation
 ````swift
 let manager = APScheduledLocationManager(delegate: self)
 ````
-##### 4. Confirm to ````APScheduledLocationManagerDelegate```` 
+
+If you want control over more of the options you can do the following:
+````swift
+let manager = APSScheduledLocationManager(delegate: self, desiredAccuracy: kCLLocationAccuracyNearestTenMeters, distanceFilter: kCLDistanceFilterNone, pausesLocationUpdatesAutomatically: true)
+````
+
+The defaults are:
+- `desiredAccuracy`: `kCLLocationAccuracyBest`
+- `distanceFilter`: `kCLDistanceFilterNone`
+- `pausesLocationUpdatesAutomatically`: `false`
+
+##### 4. Confirm to ````APScheduledLocationManagerDelegate````
 
 ````swift
 func scheduledLocationManager(_ manager: APScheduledLocationManager, didFailWithError error: Error){
@@ -54,10 +65,18 @@ func scheduledLocationManager(_ manager: APScheduledLocationManager, didUpdateLo
 func scheduledLocationManager(_ manager: APScheduledLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
 
 }
+
+func locationManagerDidPauseLocationUpdates(_ manager: APScheduledLocationManager) {
+
+}
+
+func locationManagerDidResumeLocationUpdates(_ manager: APScheduledLocationManager) {
+
+}
 ````
 ##### 5. Request authorized always permission
 
-You can use ````requestAlwaysAuthorization```` helper method of ````APScheduledLocationManager```` or your own implementation. 
+You can use ````requestAlwaysAuthorization```` helper method of ````APScheduledLocationManager```` or your own implementation.
 
 
 
@@ -66,19 +85,19 @@ You can use ````requestAlwaysAuthorization```` helper method of ````APScheduledL
 ````swift
 manager.startUpdatingLocation(interval: 170, acceptableLocationAccuracy: 100)
 ````
-There are 2 options to adjust the location manager: 
+There are 2 options to adjust the location manager:
 
 - ````interval: TimeInterval```` - interval with which the location will be gathered. The range is between 2 - 170 seconds, lower or higher values will be overwritten
-- ````acceptableLocationAccuracy: CLLocationAccuracy```` - the location manager will wait till locations with desired accuracy are retrieved. 
+- ````acceptableLocationAccuracy: CLLocationAccuracy```` - the location manager will wait till locations with desired accuracy are retrieved.
 
 
 ##### 7. To stop location manager call ````stopLocationManager````
 
-## Example 
+## Example
 
 See an example app ````ScheduledLocationExample```` in the repository
 
-Note, if you test on a stimulater edit scheme and set default location. 
+Note, if you test on a stimulater edit scheme and set default location.
 
 ## License
 
