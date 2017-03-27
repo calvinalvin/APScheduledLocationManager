@@ -15,6 +15,8 @@ public protocol APScheduledLocationManagerDelegate {
     func scheduledLocationManager(_ manager: APScheduledLocationManager, didFailWithError error: Error)
     func scheduledLocationManager(_ manager: APScheduledLocationManager, didUpdateLocations locations: [CLLocation])
     func scheduledLocationManager(_ manager: APScheduledLocationManager, didChangeAuthorization status: CLAuthorizationStatus)
+    func locationManagerDidPauseLocationUpdates(_ manager: APScheduledLocationManager)
+    func locationManagerDidResumeLocationUpdates(_ manager: APScheduledLocationManager)
 }
 
 
@@ -38,21 +40,22 @@ public class APScheduledLocationManager: NSObject, CLLocationManagerDelegate {
     public private(set) var checkLocationInterval: TimeInterval = 10
     public private(set) var isRunning = false
     
-    public init(delegate: APScheduledLocationManagerDelegate) {
+    public init(delegate: APScheduledLocationManagerDelegate, desiredAccuracy: CLLocationAccuracy? = kCLLocationAccuracyBest, distanceFilter: CLLocationDistance? = kCLDistanceFilterNone, pausesLocationUpdatesAutomatically: Bool? = false) {
        
         self.delegate = delegate
         
         super.init()
-        
-        configureLocationManager()
+      
+        configureLocationManager(desiredAccuracy: desiredAccuracy!, distanceFilter: distanceFilter!,  pausesLocationUpdatesAutomatically: pausesLocationUpdatesAutomatically!)
+      
     }
     
-    private func configureLocationManager(){
+    private func configureLocationManager(desiredAccuracy: CLLocationAccuracy, distanceFilter: CLLocationDistance, pausesLocationUpdatesAutomatically: Bool) {
         
         manager.allowsBackgroundLocationUpdates = true
-        manager.desiredAccuracy = kCLLocationAccuracyBest
-        manager.distanceFilter = kCLDistanceFilterNone
-        manager.pausesLocationUpdatesAutomatically = false
+        manager.desiredAccuracy = desiredAccuracy
+        manager.distanceFilter = distanceFilter
+        manager.pausesLocationUpdatesAutomatically = pausesLocationUpdatesAutomatically
         manager.delegate = self
     }
     
@@ -65,7 +68,7 @@ public class APScheduledLocationManager: NSObject, CLLocationManagerDelegate {
         
         if isRunning {
             
-            stoptUpdatingLocation()
+            stopUpdatingLocation()
         }
         
         checkLocationInterval = interval > MaxBGTime ? MaxBGTime : interval
@@ -150,7 +153,19 @@ public class APScheduledLocationManager: NSObject, CLLocationManagerDelegate {
             startWaitTimer()
         }
     }
+  
+
+    public func locationManagerDidPauseLocationUpdates(_ manager: CLLocationManager) {
+      
+      delegate.locationManagerDidPauseLocationUpdates(self)
+    }
     
+  
+    public func locationManagerDidResumeLocationUpdates(_ manager: CLLocationManager) {
+      
+      delegate.locationManagerDidResumeLocationUpdates(self)
+    }
+  
     private func startCheckLocationTimer() {
         
         stopCheckLocationTimer()
