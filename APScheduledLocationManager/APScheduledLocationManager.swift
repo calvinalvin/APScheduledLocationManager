@@ -79,7 +79,7 @@ public class APScheduledLocationManager: NSObject, CLLocationManagerDelegate {
         startLocationManager()
     }
     
-    public func stoptUpdatingLocation() {
+    public func stopUpdatingLocation() {
         
         isRunning = false
         
